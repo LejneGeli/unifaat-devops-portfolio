@@ -1,0 +1,14 @@
+{
+  "name": "technova-api-compose",
+  "version": "1.0.0",
+  "description": "API TechNova com PostgreSQL e Redis",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ioredis": "^5.5.0",
+    "pg": "^8.13.1"
+  }
+}

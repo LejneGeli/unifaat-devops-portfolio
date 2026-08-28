@@ -1,0 +1,77 @@
+services:
+  # API Node.js construída pelo Dockerfile local
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: technova-aula02-api
+    ports:
+      - "${API_HOST_PORT}:${PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - technova-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Banco PostgreSQL com volume nomeado para persistência
+  postgres:
+    image: postgres:15-alpine
+    container_name: technova-aula02-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - technova-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cache Redis conectado pela rede interna Docker
+  redis:
+    image: redis:7-alpine
+    container_name: technova-aula02-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - technova-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Volumes nomeados persistem os dados dos serviços
+volumes:
+  postgres_data:
+  redis_data:
+
+# Rede bridge exclusiva para comunicação entre API, banco e cache
+networks:
+  technova-network:
+    driver: bridge
