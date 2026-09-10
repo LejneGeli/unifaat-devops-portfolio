@@ -19,5 +19,5 @@ variable "instance_type" {
 variable "repository_url" {
   description = "Repositório público que contém aula-04/technova-api."
   type        = string
-  default     = "https://github.com/iHawlKz7/iHawlKz7-unifaat-devops-portfolio.git"
+  default     = "https://github.com/LejneGeli/unifaat-devops-portfolio.git"
 }

@@ -1,8 +1,8 @@
 data.aws_availability_zones.available: Reading...
-data.aws_iam_policy_document.ec2_trust: Reading...
 data.aws_ami.amazon_linux_2023: Reading...
+data.aws_iam_policy_document.ec2_trust: Reading...
 data.aws_iam_policy_document.ec2_trust: Read complete after 0s [id=2851119427]
-data.aws_availability_zones.available: Read complete after 0s [id=us-east-1]
+data.aws_availability_zones.available: Read complete after 1s [id=us-east-1]
 data.aws_ami.amazon_linux_2023: Read complete after 1s [id=ami-081b0a6eac00b4f53]
 
 Terraform used the selected providers to generate the following execution
@@ -150,7 +150,7 @@ Terraform will perform the following actions:
           + "Project"     = "TechNova"
         }
       + tenancy                              = (known after apply)
-      + user_data                            = "65f8992b79652bf58e6710bb82dd0d15ca4d667c"
+      + user_data                            = "bee7d30135ff278e0ff4e7bd6060394ea3a47879"
       + user_data_base64                     = (known after apply)
       + user_data_replace_on_change          = true
       + vpc_security_group_ids               = (known after apply)
