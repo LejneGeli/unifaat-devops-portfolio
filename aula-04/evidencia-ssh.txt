@@ -1,0 +1,6 @@
+v18.20.8
+{
+    "UserId": "AROAUFS2RFJGEYXLEMCT3:i-049f7d45fd225dd74",
+    "Account": "286878935628",
+    "Arn": "arn:aws:sts::286878935628:assumed-role/LabRole/i-049f7d45fd225dd74"
+}

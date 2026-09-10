@@ -82,7 +82,7 @@ $SSH_COMMAND "sudo tail -n 100 /var/log/cloud-init-output.log"
 
 - **Multi-AZ:** as quatro subnets estão distribuídas em duas zonas de disponibilidade, reduzindo a dependência de uma única AZ e permitindo adicionar um Load Balancer futuramente.
 - **Separação pública/privada:** somente as subnets públicas recebem IP público e rota para o Internet Gateway. As privadas são reservadas para banco de dados e serviços internos.
-- **Menor privilégio:** o SG da API abre apenas SSH e a porta 3000; o SG do banco aceita PostgreSQL apenas do CIDR interno da VPC. A EC2 recebe somente `AmazonS3ReadOnlyAccess`.
+- **Segurança e menor privilégio:** o SG da API abre somente SSH e a porta 3000; o SG do banco aceita PostgreSQL apenas do CIDR interno da VPC. Como o AWS Academy bloqueia a criação de IAM Roles, a EC2 utiliza o `LabInstanceProfile` disponibilizado pelo Learner Lab.  
 - **Inicialização automática:** o User Data instala Node.js 18 e Git, clona o projeto, executa `npm install` e registra a API como serviço systemd.
 - **Chave SSH:** o Terraform cria a chave e salva a parte privada localmente com permissão `0600`; o `.gitignore` impede seu versionamento.
 
@@ -99,7 +99,7 @@ $SSH_COMMAND "sudo tail -n 100 /var/log/cloud-init-output.log"
 | SG da API | `technova-api-sg` | Libera TCP 22 e 3000 |
 | SG do banco | `technova-db-sg` | Libera TCP 5432 apenas dentro da VPC |
 | Key Pair | `technova-key` | Autenticação SSH |
-| IAM Role/Profile | `technova-ec2-*` | Concede leitura no S3 à EC2 |
+| Instance Profile | `LabInstanceProfile` | Perfil fornecido pelo AWS Academy e anexado à EC2 |
 | EC2 | `technova-api-ec2` | Executa a API Node.js na porta 3000 |
 
 ## Limpeza obrigatória

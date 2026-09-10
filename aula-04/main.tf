@@ -46,12 +46,20 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
+# Perfil já fornecido pelo AWS Academy.
+# O usuário voclabs não possui permissão para executar iam:CreateRole.
+data "aws_iam_instance_profile" "lab" {
+  name = "LabInstanceProfile"
+}
+
 resource "aws_vpc" "technova" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = { Name = "technova-vpc" }
+  tags = {
+    Name = "technova-vpc"
+  }
 }
 
 resource "aws_subnet" "public" {
@@ -62,7 +70,9 @@ resource "aws_subnet" "public" {
   availability_zone       = data.aws_availability_zones.available.names[each.value.az_index]
   map_public_ip_on_launch = true
 
-  tags = { Name = "technova-subnet-${each.key}" }
+  tags = {
+    Name = "technova-subnet-${each.key}"
+  }
 }
 
 resource "aws_subnet" "private" {
@@ -73,12 +83,17 @@ resource "aws_subnet" "private" {
   availability_zone       = data.aws_availability_zones.available.names[each.value.az_index]
   map_public_ip_on_launch = false
 
-  tags = { Name = "technova-subnet-${each.key}" }
+  tags = {
+    Name = "technova-subnet-${each.key}"
+  }
 }
 
 resource "aws_internet_gateway" "technova" {
   vpc_id = aws_vpc.technova.id
-  tags   = { Name = "technova-igw" }
+
+  tags = {
+    Name = "technova-igw"
+  }
 }
 
 resource "aws_route_table" "public" {
@@ -89,12 +104,17 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.technova.id
   }
 
-  tags = { Name = "technova-rt-public" }
+  tags = {
+    Name = "technova-rt-public"
+  }
 }
 
 resource "aws_default_route_table" "private" {
   default_route_table_id = aws_vpc.technova.default_route_table_id
-  tags                   = { Name = "technova-rt-private-default" }
+
+  tags = {
+    Name = "technova-rt-private-default"
+  }
 }
 
 resource "aws_route_table_association" "public" {
@@ -133,7 +153,9 @@ resource "aws_security_group" "api" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "technova-api-sg" }
+  tags = {
+    Name = "technova-api-sg"
+  }
 }
 
 resource "aws_security_group" "db" {
@@ -157,7 +179,9 @@ resource "aws_security_group" "db" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "technova-db-sg" }
+  tags = {
+    Name = "technova-db-sg"
+  }
 }
 
 resource "tls_private_key" "technova" {
@@ -168,7 +192,10 @@ resource "tls_private_key" "technova" {
 resource "aws_key_pair" "technova" {
   key_name   = "technova-key-${var.owner_ra}"
   public_key = tls_private_key.technova.public_key_openssh
-  tags       = { Name = "technova-key" }
+
+  tags = {
+    Name = "technova-key"
+  }
 }
 
 resource "local_sensitive_file" "private_key" {
@@ -177,42 +204,13 @@ resource "local_sensitive_file" "private_key" {
   file_permission = "0600"
 }
 
-data "aws_iam_policy_document" "ec2_trust" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    effect  = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "ec2" {
-  name               = "technova-ec2-role-${var.owner_ra}"
-  assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
-  tags               = { Name = "technova-ec2-role" }
-}
-
-resource "aws_iam_role_policy_attachment" "s3_read_only" {
-  role       = aws_iam_role.ec2.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-}
-
-resource "aws_iam_instance_profile" "ec2" {
-  name = "technova-ec2-profile-${var.owner_ra}"
-  role = aws_iam_role.ec2.name
-  tags = { Name = "technova-ec2-profile" }
-}
-
 resource "aws_instance" "api" {
   ami                         = data.aws_ami.amazon_linux_2023.id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.public["public-a"].id
   vpc_security_group_ids      = [aws_security_group.api.id]
   key_name                    = aws_key_pair.technova.key_name
-  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  iam_instance_profile        = data.aws_iam_instance_profile.lab.name
   associate_public_ip_address = true
 
   user_data = templatefile("${path.module}/user-data.sh.tftpl", {
@@ -230,13 +228,17 @@ resource "aws_instance" "api" {
     volume_type = "gp3"
     volume_size = 8
     encrypted   = true
-    tags        = merge(local.common_tags, { Name = "technova-api-root-volume" })
+
+    tags = merge(local.common_tags, {
+      Name = "technova-api-root-volume"
+    })
   }
 
   depends_on = [
-    aws_internet_gateway.technova,
-    aws_iam_role_policy_attachment.s3_read_only
+    aws_internet_gateway.technova
   ]
 
-  tags = { Name = "technova-api-ec2" }
-}
+  tags = {
+    Name = "technova-api-ec2"
+  }
+} 
