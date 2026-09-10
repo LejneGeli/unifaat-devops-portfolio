@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y git curl
+curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+dnf install -y nodejs
+
+git clone "${repository_url}" /opt/technova-api
+cd /opt/technova-api/aula-04/technova-api
+npm install --omit=dev
+chown -R ec2-user:ec2-user /opt/technova-api
+
+cat >/etc/systemd/system/technova-api.service <<'SERVICE'
+[Unit]
+Description=TechNova Node.js API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/technova-api/aula-04/technova-api
+Environment=PORT=3000
+ExecStart=/usr/bin/node app.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable --now technova-api

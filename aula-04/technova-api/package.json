@@ -1,0 +1,13 @@
+{
+  "name": "technova-api-aula-04",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API mínima para validar o User Data da EC2",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
