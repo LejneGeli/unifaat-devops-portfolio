@@ -1,0 +1,39 @@
+# Entrega — Aula 04: VPC + EC2 Multi-AZ
+
+**Aluno:** Caroline Lejne Geli  
+**RA:** 6325016  
+**Data:** 09/09/2026
+
+## Repositório
+
+- URL: https://github.com/iHawlKz7/iHawlKz7-unifaat-devops-portfolio
+
+## Evidências
+
+- [ ] VPC com 4 subnets (2 públicas + 2 privadas) em 2 AZs
+- [ ] Internet Gateway + Route Tables configurados
+- [ ] Security Groups com menor privilégio
+- [ ] EC2 t2.micro com User Data (API rodando)
+- [ ] Instance Profile com IAM Role
+- [ ] Tags em todos os recursos
+- [ ] `evidencia-plan.txt` com evidência do plano
+- [ ] README com diagrama da arquitetura
+- [ ] `terraform destroy` executado após evidências
+
+## Evidência da API Rodando
+
+```json
+COLE AQUI AS RESPOSTAS DE / E /health
+```
+
+## Evidência do SSH e Instance Profile
+
+```text
+COLE AQUI O CONTEÚDO DE evidencia-ssh.txt
+```
+
+## Evidência do Terraform
+
+```text
+COLE AQUI UM RESUMO DO APPLY E DOS OUTPUTS
+```
